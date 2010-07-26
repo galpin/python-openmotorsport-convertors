@@ -40,22 +40,20 @@ def convert(source_folder):
   dest.metadata.user = source.driver
   dest.metadata.venue['name'] = source.track
   dest.metadata.vehicle['name'] = 'Unknown' # not stored
-  dest.markers = convert_laps_to_markers(source.laps)
+  convert_laps_to_markers(source.laps, dest)
   dest.num_sectors = 0
     
   [dest.add_channel(convert_channel(c)) for c in source.channels]
 
   return dest.write('output.om')
   
-def convert_laps_to_markers(laps):
+def convert_laps_to_markers(laps, dest):
   '''Convert a list of individual lap times into a list of markers over the
   duratino on the session.'''
   cumulative = 0
-  markers = []
   for lap in laps:
     cumulative += lap
-    markers.append(cumulative)
-  return markers
+    dest.add_marker(cumulative)
 
 def convert_channel(imp_channel):
   '''Straight conversion from IMP.Channel to OM.Channel.'''
