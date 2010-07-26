@@ -6,5 +6,9 @@ setup(
   description='A library of convertors from various file formats to OpenMotorsport.',
   author='Martin Galpin',
   author_email='m@66laps.com',
-  url='http://developer.66laps.com/'
+  url='http://developer.66laps.com/',
+  license='GNU General Public License v3',
+  packages=['piresearch'],
+  scripts=['lfs2om.py', 'imp2om.py'],
+  install_requires=['python-liveforspeed', 'python-openmotorsport', 'numpy']
 )

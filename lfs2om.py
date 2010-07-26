@@ -1,4 +1,4 @@
-# #!/usr/bin/python2.6
+#!/usr/bin/env python
 #
 # Converts a given LFS Replay Analayser file to OpenMotorsport.
 #
