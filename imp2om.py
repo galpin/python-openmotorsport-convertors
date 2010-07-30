@@ -40,6 +40,7 @@ def convert(source_folder):
   dest.metadata.user = source.driver
   dest.metadata.venue['name'] = source.track
   dest.metadata.vehicle['name'] = 'Unknown' # not stored
+  dest.metadata.comments = 'Converted from Pi IMP using imp2om.py'
   convert_laps_to_markers(source.laps, dest)
   dest.num_sectors = 0
     
