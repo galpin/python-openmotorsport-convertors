@@ -62,7 +62,7 @@ def convert_channel(imp_channel):
     id = imp_channel.id,
     name = imp_channel.name,
     units = imp_channel.units, # TODO normalize
-    interval = imp_channel.sample_rate,
+    interval = imp_channel.sample_interval,
     data = imp_channel.data
   )
 
