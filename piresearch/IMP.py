@@ -165,19 +165,18 @@ class Channel(object):
 
   def __repr__(self):
     return '%s (%s)' % (self.name, self.units)
-      
+
 def _readchars(source, size, delimeter='\x00'):
   '''Reads size characters from source up until a given size.'''
   destination = StringIO.StringIO()
-  total = 1
-  while total < size:
+  while size >= 0:
     c = struct.unpack('<c', source.read(1))[0]
+    size -= 1
     if c == delimeter:
       break
     destination.write(_encode(c))
-    total += 1
-  source.read(size-total)
-  return destination.getvalue()
+  source.read(size)
+  return destination.getvalue()  
 
 def _toseconds(str):
   '''Converts a string formatted as MM:SS:MS to pure seconds.'''
