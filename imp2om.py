@@ -32,6 +32,23 @@ import numpy as np
 from piresearch import IMP
 import openmotorsport.openmotorsport as OM
 
+# A collection on common Pi channel names and more meaningful descriptions
+# Each element is a tuple of (channel_name, channel_group)
+COMMON_CHANNEL_NAMES = {
+  'THROT': ('Throttle', 'Driver'),
+  'GEAR': ('Gear', 'Driver'),
+  'RPM': ('RPM', 'Engine'),
+  'OILT': ('Oil Temperature', 'Engine'),
+  'OILP': ('Oil Pressure', 'Engine'),
+  'FUELP': ('Fuel Pressure', 'Engine'),
+  'BATTV': ('Battery', 'Engine'),
+  'BOOST': ('Boost', 'Engine'),
+  'Speed': ('Speed', 'Position'),
+  'ACCEL': ('Acceleration X', 'Acceleration'),
+  'INLIN': ('Acceleration Y', 'Acceleration'),  
+}
+
+
 def convert(source_folder):
   '''Creates a new OpenMotorsport file from a given Pi IMP folder. Returns
   the path to the new file.'''
@@ -57,11 +74,20 @@ def convert_laps_to_markers(laps, dest):
     cumulative += lap
     dest.add_marker(cumulative)
 
+def normalise_name(channel_name):
+  '''Get a better channel name for a given channel name is one exists.'''
+  if channel_name in COMMON_CHANNEL_NAMES:
+    return COMMON_CHANNEL_NAMES[channel_name]
+  return channel_name, None
+
 def convert_channel(imp_channel):
   '''Straight conversion from IMP.Channel to OM.Channel.'''
+  name, group = normalise_name(imp_channel.name)
+
   return OM.Channel(
     id = imp_channel.id,
-    name = imp_channel.name,
+    name = name,
+    group = group,
     units = imp_channel.units, # TODO normalize
     timeseries = UniformTimeSeries(
       frequency = Frequency.from_interval(imp_channel.sample_interval),
