@@ -20,6 +20,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 # USA.
+from openmotorsport.time import UniformTimeSeries, Frequency
 
 __author__  = 'Martin Galpin'
 __contact__ = 'm@66laps.com'
@@ -120,7 +121,7 @@ def convert_data_block(index, block, session):
       if k in MULTIPLICATION_FACTORS:
         v = v * MULTIPLICATION_FACTORS[k]
         
-      session.get_channel(CHANNEL_MAP[k][0], CHANNEL_MAP[k][1]).data[index] = v
+      session.get_channel(CHANNEL_MAP[k][0], CHANNEL_MAP[k][1]).timeseries.data[index] = v
     except: pass # field not mapped
       
   # TODO what is the order of the wheel blocks?
@@ -130,7 +131,7 @@ def convert_data_block(index, block, session):
 def convert_wheel_data_block(index, block, group, session):
   '''Convert an instance of lfs.DynamicWheelInfo to an openmotorsport.Session.'''
   for k, v in block.__dict__.items():
-    session.get_channel(CHANNEL_MAP[k][0], group).data[index] = v
+    session.get_channel(CHANNEL_MAP[k][0], group).timeseries.data[index] = v
   
 def convert(filepath):
   '''Converts a given LFS Replay Analayser file to OpenMotorsport. Returns the
@@ -148,16 +149,18 @@ def convert(filepath):
   num_blocks = len(replay.data)
         
   session.num_sectors = replay.num_splits - 1
-  [session.add_marker(mstos(x)) for x in replay.splits]
+  [session.add_marker(x) for x in replay.splits]
   
   for index, c in enumerate(CHANNELS): 
     session.add_channel(OM.Channel(
       id = index,
-      interval = replay.update_interval,
       name = c['name'],
       units = c['units'] if 'units' in c else None,
       group = c['group'],
-      data = np.zeros(num_blocks, dtype=np.float32)
+      timeseries = UniformTimeSeries(
+        frequency = Frequency.from_interval(replay.update_interval),
+        data =  np.zeros(num_blocks, dtype=np.float32)
+      )
     ))
     
   [convert_data_block(index, b, session) for index, b in enumerate(replay.data)]
@@ -166,7 +169,6 @@ def convert(filepath):
   
 
 def comments(replay): return 'Weather: %s' % (replay.weather)
-def mstos(x): return float(x)/1000
 
 # main function
 if __name__ == "__main__":

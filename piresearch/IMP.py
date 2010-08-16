@@ -141,7 +141,7 @@ class Session(object):
     times = []
     with open('%s/%s' % (root, filename), 'r') as f:
       for line in f.xreadlines():
-        times.append(_toseconds(line.strip()))
+        times.append(_tomilliseconds(line.strip()))
     return times
     
   def _read_desc(self, root, filename='desc.dat'):
@@ -178,18 +178,18 @@ def _readchars(source, size, delimeter='\x00'):
   source.read(size)
   return destination.getvalue()  
 
-def _toseconds(str):
+def _tomilliseconds(str):
   '''Converts a string formatted as MM:SS:MS to pure seconds.'''
   search = re.search('(\d+):(\d+).(\d+)', str)
-  seconds = 0.
+  milliseconds = 0.
   if search:
     if search.group(1):
-      seconds += int(search.group(1)) * 60 # convert minutes to seconds
+      milliseconds += int(search.group(1)) * 60000
     if search.group(2):
-      seconds += int(search.group(2))
+      milliseconds += int(search.group(2)) * 1000
     if search.group(3):
-      seconds += int(search.group(3)) * 0.01 # convert to milliseconds
-  return seconds 
+      milliseconds += int(search.group(3)) * 10
+  return milliseconds
   
 def _encode(c):
   '''Encode troublesome extended ASCII characters to Unicode.'''

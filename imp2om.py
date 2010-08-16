@@ -20,6 +20,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 # USA.
+from openmotorsport.time import UniformTimeSeries, Frequency
 
 __author__  = 'Martin Galpin'
 __contact__ = 'm@66laps.com'
@@ -46,8 +47,8 @@ def convert(source_folder):
     
   [dest.add_channel(convert_channel(c)) for c in source.channels]
 
-  return dest.write('output.om')
-  
+  return dest.write('%s.om' % os.path.splitext(source_folder)[0])
+
 def convert_laps_to_markers(laps, dest):
   '''Convert a list of individual lap times into a list of markers over the
   duratino on the session.'''
@@ -62,8 +63,10 @@ def convert_channel(imp_channel):
     id = imp_channel.id,
     name = imp_channel.name,
     units = imp_channel.units, # TODO normalize
-    interval = imp_channel.sample_interval,
-    data = imp_channel.data
+    timeseries = UniformTimeSeries(
+      frequency = Frequency.from_interval(imp_channel.sample_interval),
+      data = imp_channel.data
+    )
   )
 
 # main function
