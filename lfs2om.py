@@ -139,6 +139,7 @@ def convert(filepath):
   replay = lfs.Replay(filepath)
 
   session = OM.Session()
+  session.metadata.duration = replay.splits[-1]
   session.metadata.user = replay.player
   session.metadata.venue['name'] = replay.track
   session.metadata.venue['configuration'] = replay.config
