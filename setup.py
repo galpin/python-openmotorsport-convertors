@@ -10,5 +10,6 @@ setup(
   license='GNU General Public License v3',
   packages=['piresearch'],
   scripts=['lfs2om.py', 'imp2om.py'],
+  py_modules=['lfs2om'],
   install_requires=['python-liveforspeed', 'python-openmotorsport', 'numpy']
 )
