@@ -120,20 +120,20 @@ def convert_data_block(index, block, session):
       # apply any multiplication factors
       if k in MULTIPLICATION_FACTORS:
         v = v * MULTIPLICATION_FACTORS[k]
-        
+
       session.get_channel(CHANNEL_MAP[k][0], CHANNEL_MAP[k][1]).timeseries.data[index] = v
     except: pass # field not mapped
-      
+
   # TODO what is the order of the wheel blocks?
   for x, group in enumerate(WHEELS):
-    convert_wheel_data_block(index, block.wheels[x], group, session)      
-    
+    convert_wheel_data_block(index, block.wheels[x], group, session)
+
 def convert_wheel_data_block(index, block, group, session):
   '''Convert an instance of lfs.DynamicWheelInfo to an openmotorsport.Session.'''
   for k, v in block.__dict__.items():
     session.get_channel(CHANNEL_MAP[k][0], group).timeseries.data[index] = v
-  
-def convert(filepath):
+
+def convert(filepath, destination):
   '''Converts a given LFS Replay Analayser file to OpenMotorsport. Returns the
   path to the new file.'''
   replay = lfs.Replay(filepath)
@@ -148,11 +148,11 @@ def convert(filepath):
   session.metadata.comments = comments(replay)
 
   num_blocks = len(replay.data)
-        
+
   session.num_sectors = replay.num_splits - 1
   [session.add_marker(x) for x in replay.splits]
-  
-  for index, c in enumerate(CHANNELS): 
+
+  for index, c in enumerate(CHANNELS):
     session.add_channel(OM.Channel(
       id = index,
       name = c['name'],
@@ -163,11 +163,11 @@ def convert(filepath):
         data =  np.zeros(num_blocks, dtype=np.float32)
       )
     ))
-    
+
   [convert_data_block(index, b, session) for index, b in enumerate(replay.data)]
-      
-  return session.write('%s.om' % os.path.splitext(filepath)[0])
-  
+
+  return session.write(destination)
+
 
 def comments(replay): return 'Weather: %s' % (replay.weather)
 
@@ -177,5 +177,6 @@ if __name__ == "__main__":
     print >> sys.stderr, 'Converts a given LFS Replay Analayser file to OpenMotorsport.'
     print >> sys.stderr, 'usage: python lfs2om.py source_file'
     sys.exit(0)
-    
-  print 'Successfully created', convert(sys.argv[-1])
+  filepath = sys.argv[-1]
+  destination = '%s.om' % os.path.splitext(filepath)[0]
+  print 'Successfully created', convert(filepath)
