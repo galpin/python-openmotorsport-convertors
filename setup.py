@@ -11,5 +11,6 @@ setup(
   packages=['piresearch'],
   scripts=['lfs2om.py', 'imp2om.py'],
   py_modules=['lfs2om'],
-  install_requires=['python-liveforspeed', 'python-openmotorsport', 'numpy']
+  # disable install requires until packages are in PyPi
+  #install_requires=['python-liveforspeed', 'python-openmotorsport', 'numpy']
 )
